@@ -1,27 +1,158 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+{% extends 'base.html' %}
+{% block homepage %}
+<div class='row text-center '>
+  <h1> Welcome To Tweetus</h1>
+</div>
+<div class='row mb-3'>
+  <div class='col-md-4 mx-md-auto col-10'>
+    <form class='form' id="to-write-a-tweet" method="post" action="/create-tweet">
+      {% csrf_token %}
+      <div class="d-none alert alert-danger" id="to_print_alert_message"></div>
+      <input type="hidden" value="/" name="next" />
+      <!-- this name=""next"" is the url which has been defined in the views.py   -->
+      <textarea required="required" class="form-control" name="content" placeholder="type your tweet"></textarea>
+      <!-- this textarea is the place where we give input(we write somthing in it) -->
+      <button class="btn btn-dark my-3" type="submit">Tweet</button>
+    </form>
+  </div>
+</div>
+<div class='row' id="list">
+  this html will be replaced by the load_tweets
+</div>
+<script>
+  function to_handle_error_message(msg, display){
+    var message_div_element= document.getElementById("to_print_alert_message")
+    if(display === true)
+    {
+      message_div_element.setAttribute("class","d-block alert alert-danger")
+      message_div_element.innerText=msg;  // this if condition is used to show the error 
+    }
+    else{
+      message_div_element.setAttribute("class","d-none alert alert-danger")
+    }
+  }
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  function to_handle_a_tweet_while_its_been_submitted(event) {
+    event.preventDefault() 
+    // this preventDefault() helps us to prevent the tweets to be submitted by a default method   
+    console.log(event)
+    const myForm = event.target
+    const myFormData = new FormData(myForm)
+    const url = myForm.getAttribute("action")
+    const method = myForm.getAttribute("method")
+    const xhr = new XMLHttpRequest()                          // still having confusion in it.
+    const responseType= "json"
+    xhr.responseType = responseType
+    xhr.open(method, url)
+    xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest")
+    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest")
+    xhr.onload = function() {
+      if (xhr.status === 201) {
+            to_handle_error_message("", false)
+            const newTweetJson = xhr.response
+            const newTweetElement = format_of_the_list(newTweetJson)   // i think that the compiler is not 
+                                                                      // getting inside the if condition(now it is working the problem was with this getelement.innerhtml)
+            const ogHtml = getelement.innerHTML
+            getelement.innerHTML = newTweetElement + ogHtml          
+            myForm.reset()
+         }else if(xhr.status === 400){
+          const erroroccured= xhr.response                  // this if condition are used to handle server
+          const errormsg= erroroccured.content
+          let msgview;
+          if(errormsg){
+            msgview=errormsg[0]
+            if(msgview){
+              to_handle_error_message(msgview,true)
+            }
+            else{
+              alert("An error occured")
+            }
+          }else{
+            alert("An error occured")
+          }
+                                    // errors (i.e it shows what error has been occured)
+        } else if(xhr.status === 500){   
+          alert("this is server error")
+      }
+        // const serverResponse = xhr.response
+        // // console.log(serverResponse)
+        // const tweetsEl = document.getElementById("list") //
+        // load_tweets(getelement)
+      }
+      xhr.onerror =function(){
+         alert("server is down please try again later")
+      } 
+      xhr.send(myFormData)
+  }
+  const to_create_tweet = document.getElementById('to-write-a-tweet')
+  to_create_tweet.addEventListener("submit",to_handle_a_tweet_while_its_been_submitted)
+  // while submit the the tweet what tweet us website needs to do has  been defined
+  //  this eventlistener helps us to call a function whenever a user interacts with websites
+  // (here the user is clicking on submit btn) to_handle_a_tweet_while_its_been_submitted
+  
+  const getelement = document.getElementById('list')
+  
+  
+  function load_tweets(get_elements_tweets) {
+    // this function will load the tweets from the database and prints them 
+    // in the respective spaces in the home page of the tweetus. 
+    const xhr = new XMLHttpRequest()
+    const method = 'GET' //(CRUD operation) methods(for more information refer notes)
+    const url = '/tweet'
+    const responseType = 'json'
+    xhr.responseType = responseType
+    xhr.open(method, url) // here we opening the url '/tweet' which links to tweet-list
+    // (it is defined in views.py)
+    xhr.onload = function () { 
+      // after opening(loading) the url(/tweet) what we need to do, is defined in this function
+      const serverResponse = xhr.response
+      const listedItems = serverResponse.response
+      var listedobjects = ""
+      for (let i = 0; i < listedItems.length; i++) {
+        let listed=listedItems[i]
+        currentobj = format_of_the_list(listed) //this function defines how to display the data 
+        // which has been stored in the data. 
+        listedobjects += currentobj
+      }
+      get_elements_tweets.innerHTML = listedobjects
+    }
+    xhr.send()
+  }
 
-    <title>Hello, world!</title>
-  </head>
-  <body>
-    <h1>Hello, world!</h1>
+  load_tweets(getelement) // function call 
 
-    <!-- Optional JavaScript; choose one of the two! -->
+  function To_make_a_count_of_likes(tweet, count) { 
+    // this function is used to count number of likes for the comment or the post
+    console.log(tweet, count)
+    return
+  }
 
-    <!-- Option 1: Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  function like_button(tweet) { // this function is used to create a button 
+    return "<button class='btn btn-dark' onclick=To_make_a_count_of_likes(" + tweet.id + "," + tweet.likes + ")> " + tweet.likes + " likes</button>"
+  } 
 
-    <!-- Option 2: Separate Popper and Bootstrap JS -->
-    <!--
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
-    -->
-  </body>
-</html>
+  function format_of_the_list(tweetobj) {
+    var return_format = "<div class=' container mx-auto col-12 col-md-10  border rounded py-2 mb-4'>" + "<h1>" + tweetobj.id + "</h1>" +
+      "<p>" + tweetobj.contents + "</p>" +"<p>" + "<div class='btn-group'>"  +
+         like_button(tweetobj) + "</div>" + "</p>" + "</div>"
+    return return_format;
+  } // this function is used to extract data from the string and return the data to print data .
+  // "<p>" + tweetobj.dates + "</p>"
+
+  // xhr.onload = function () { // after opening(loading) that url(/tweet) what we need to do after opening that url
+  //                             //  is defined in this function
+  //   const serverResponse = xhr.response
+  //   const listedItems = serverResponse.response
+  //   var listedobjects = ""
+  //   for (let i = 0; i < listedItems.length; i++) {
+  //     currentobj = format_of_the_list(listedItems[i])
+  //     listedobjects += currentobj
+  //   }
+  //   getelement.innerHTML = listedobjects
+  //   console.log(listedItems)
+  // }
+  // xhr.send()
+
+</script>
+
+{% endblock homepage %}

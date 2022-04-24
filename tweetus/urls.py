@@ -15,12 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from tweets.views import home_page, home_page_html, tweet__id, tweet__ids
+from tweets.forms import tweetforms
+from tweets.views import create_view_of_the_tweet, home_page, home_page_html, tweet__id, tweet__ids, tweet_list
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path ('tweet/<int:tweet_id>',home_page),
+   # path ('tweet/<int:tweet_id>',home_page),
     path('t/<int:tweet_id>',tweet__id),# normal way of accessing data base.
     path('ts/<int:tweet_id>',tweet__ids),#this path is for REST api(accessing database)
-    path('home/',home_page_html)
-    
+    path('',home_page_html),
+    path('tweet/',tweet_list),#this is for viewing tweet_list
+    path('create-tweet', create_view_of_the_tweet),# this is for creating the tweet.
 ]
