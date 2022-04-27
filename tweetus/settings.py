@@ -28,6 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'mydomain.com']
 
+LOGIN_URL= '/login' # whenever user is not loged in properly then we use this login path
+
 
 # Application definition
 
@@ -38,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework', 
     'tweets',
 ]
 
