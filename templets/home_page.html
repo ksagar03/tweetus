@@ -73,6 +73,10 @@
                                     // errors (i.e it shows what error has been occured)
         } else if(xhr.status === 500){   
           alert("this is server error")
+      } else if(xhr.status === 401)
+      {
+        alert(" you have not loged in, please login to tweet")
+        window.location.href='/login'
       }
         // const serverResponse = xhr.response
         // // console.log(serverResponse)

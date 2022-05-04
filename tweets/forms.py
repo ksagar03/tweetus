@@ -1,6 +1,7 @@
 from django import forms
 from .models import tweet
-max_tweet_length = 10
+from django.conf import settings
+max_tweet_length= settings.MAX_TWEET_LENGTH
 class tweetforms(forms.ModelForm):
     class Meta:  # this method is used to define the aboxe class format 
         model=tweet

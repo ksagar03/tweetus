@@ -17,8 +17,8 @@ class tweet(models.Model):
     # dates = models.DateTimeField()
     # likes=models.IntegerField(blank=True,null=True)
 
-    class meta:
-        ordering= ['-id']
+    class Meta:    # this meta needs to be in 'Meta' format otherwise it wont work
+        ordering = ['-id']
     
     def serialize(x):
         # tw_list=" [{"id":x.id,"contents":x.content,"likes":random.randint(1,100)} " for x in list]

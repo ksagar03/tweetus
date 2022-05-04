@@ -10,8 +10,8 @@ from django.utils.http import is_safe_url # is safe url is a built in function o
 # django which is used to check whether the next url(redirected) is the safe url or not
 #  we can also provide the url IP address which can be trusted or which are important to us 
 # can be saved in the setting.py-> allowed Host.
-from tweetus import settings
-
+from django.conf import settings
+from .serializers import tweetserializers
 allowedhost=settings.ALLOWED_HOSTS # importing allowed host from the settings.py
 # Create your views here.
 
@@ -26,17 +26,33 @@ def home_page_html(request):
     # {'DIRS':[os.path.join(BASE_DIR,"templets")]} 
 
 
+def create_view_of_the_tweet_using_rest_api(request,*args, **kwargs):
+   
+    serializer= tweetserializers( data=request.POST or None)
+    print("serializer=",serializer.is_valid())
+    if serializer.is_valid():
+        serializer.save(user=request.user)
+    return JsonResponse({}, status=400)
 
 def create_view_of_the_tweet(request,*args, **kwargs):
+    user = request.user 
     # print("ajax", request.is_ajax())
+    #  next we are checking whether the login account is valid or not
+    if not request.user.is_authenticated:
+        user= None
+        if request.is_ajax():
+            return JsonResponse({}, status= 401) # if the website returns in aajax format then this condition is used 
+        return redirect(settings.LOGIN_URL) # if it is normal http respose then we use this condition
+
     form=tweetforms(request.POST or None) #this command will accept the tweet using request.post and if 
     # we won't write any thing then it just returns and then it will accept none .
     # tweetforms-is a def which has been imported from the forms.html
     next_url= request.POST.get("next") or None # this variable will be saving the next url where the  
     # webpage is redirecting (i.e when ever we click a button)
-    print("valid", form.is_valid())
+    # print("valid", form.is_valid())
     if form.is_valid(): # if the tweet is valid then the tweet will be saved in the database.
         obj=form.save(commit=False)
+        obj.user=user
         obj.save()
         if request.is_ajax():
             return JsonResponse(obj.serialize(), status=201)
