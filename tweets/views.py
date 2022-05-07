@@ -26,12 +26,12 @@ def home_page_html(request):
     # {'DIRS':[os.path.join(BASE_DIR,"templets")]} 
 
 
-def create_view_of_the_tweet_using_rest_api(request,*args, **kwargs):
-   
+def create_view_of_the_tweet_using_rest_api(request,*args, **kwargs): 
     serializer= tweetserializers( data=request.POST or None)
     print("serializer=",serializer.is_valid())
     if serializer.is_valid():
-        serializer.save(user=request.user)
+        obj=serializer.save(user=request.user)
+        return JsonResponse(serializer.data, status=201)
     return JsonResponse({}, status=400)
 
 def create_view_of_the_tweet(request,*args, **kwargs):

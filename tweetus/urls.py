@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from tweets.forms import tweetforms
-from tweets.views import create_view_of_the_tweet, home_page, home_page_html, tweet__id, tweet__ids, tweet_list
+from tweets.views import create_view_of_the_tweet, home_page, home_page_html, tweet__id, tweet__ids, tweet_list, create_view_of_the_tweet_using_rest_api
 urlpatterns = [
     path('admin/', admin.site.urls),
    # path ('tweet/<int:tweet_id>',home_page),
@@ -24,5 +24,6 @@ urlpatterns = [
     path('ts/<int:tweet_id>',tweet__ids),#this path is for REST api(accessing database)
     path('',home_page_html),
     path('tweet/',tweet_list),#this is for viewing tweet_list
-    path('create-tweet', create_view_of_the_tweet),# this is for creating the tweet.
+    # path('create-tweet', create_view_of_the_tweet),# this is for creating the tweet.
+    path ('create-tweet', create_view_of_the_tweet_using_rest_api)
 ]
