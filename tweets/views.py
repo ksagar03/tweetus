@@ -6,6 +6,16 @@ from django.shortcuts import redirect, render
 from .models import tweet
 import random  
 from .forms import tweetforms
+
+from rest_framework.response import Response
+# Response is a special property of rest_framework which help us to send the jsonresponse
+#  same as jsonrespose keyword 
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+# this api_view allows us to mention which CRUD operation[method] we are doing 
+# permission_class allows us to bring in multiple level permission
+# IsAuthenticated is a function which allows us to authenticate the tweets which will be posted
+# by the user. 
 from django.utils.http import is_safe_url # is safe url is a built in function of 
 # django which is used to check whether the next url(redirected) is the safe url or not
 #  we can also provide the url IP address which can be trusted or which are important to us 
@@ -25,21 +35,53 @@ def home_page_html(request):
     # we can set the path of the templets folder in settings.py 
     # {'DIRS':[os.path.join(BASE_DIR,"templets")]} 
 
-
+@api_view(['POST'])#defining which method we are using
+@permission_classes([IsAuthenticated]) # this single line help us to authenticate the tweets
+#posted by the user  
 def create_view_of_the_tweet_using_rest_api(request,*args, **kwargs): 
-    serializer= tweetserializers( data=request.POST or None)
-    print("serializer=",serializer.is_valid())
-    if serializer.is_valid():
-        obj=serializer.save(user=request.user)
-        return JsonResponse(serializer.data, status=201)
-    return JsonResponse({}, status=400)
+    serializer= tweetserializers( data=request.POST)
+    # print("serializer=",serializer.is_valid())
+    if serializer.is_valid(raise_exception=True):
+        serializer.save(user=request.user)
+        return Response(serializer.data, status=201)
+    return Response({}, status=400)
+
+# ////////IMP /////////
+#  in regular form method which is mentioned below(create_view_of_the_tweet) we need to think about 
+# the error condition(i.e if the data is not valid) and we need to write the separate code for it 
+# but in the rest_framework we can directly mention in the if condition .is_valid()
+#  if serializer.is_valid(raise_exception=True): -- this statement will automatically raise the
+# error condition. 
+
+
+@api_view(['GET'])
+
+def tweet_id_detailed_view_using_rest_api(request,tweet_id,*args, **kwargs):
+    list=tweet.objects.filter(id=tweet_id)
+    if not list.exists():
+        return Response({}, status=401)
+    detailed_view_of_list=list.first() # this line will store resent tweet in the variable
+    serializer=tweetserializers(detailed_view_of_list)
+    return Response(serializer.data, status=201 )
+
+@api_view(['GET'])
+def tweet_list_using_rest_api(request,*args, **kwargs):
+    list=tweet.objects.all()
+    serializer=tweetserializers(list, many=True)
+    # tweet_list_view=[x.serialize() for x in list]
+    # data={
+    #     "isUser": False,                           all this line will be replaced by serial
+    #     "response": tweet_list_view
+    # }
+    return Response(serializer.data, status=200)
+
 
 def create_view_of_the_tweet(request,*args, **kwargs):
     user = request.user 
     # print("ajax", request.is_ajax())
     #  next we are checking whether the login account is valid or not
     if not request.user.is_authenticated:
-        user= None
+        user= None               # This if condition is used to authenicate the users and there tweets 
         if request.is_ajax():
             return JsonResponse({}, status= 401) # if the website returns in aajax format then this condition is used 
         return redirect(settings.LOGIN_URL) # if it is normal http respose then we use this condition
@@ -60,7 +102,7 @@ def create_view_of_the_tweet(request,*args, **kwargs):
             return redirect(next_url) # this conditon will redirect the webpage to the home page
         # redirect-> it is a shortcut feature of django which can redirect to any specified webpage. 
         form=tweetforms() 
-    if form.errors:
+    if form.errors:                   #if serializer.is_valid(raise_exception=True): rest_framework
          if form.is_ajax():
             return JsonResponse(form.errors, status=400)
     return render(request,'form.html',context={"form":form})

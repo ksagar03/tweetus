@@ -15,16 +15,17 @@ class tweet(models.Model):
         # error should not be rised.
     image=models.FileField(upload_to='',blank=True, null=True)
     # dates = models.DateTimeField()
-    # likes=models.IntegerField(blank=True,null=True)
+    # likes=models.IntegerField(blank=True,null=True)As like function is not yet written
+  
 
     class Meta:    # this meta needs to be in 'Meta' format otherwise it wont work
         ordering = ['-id']
     
-    def serialize(x):
+    def serialize(self):
         # tw_list=" [{"id":x.id,"contents":x.content,"likes":random.randint(1,100)} " for x in list]
         # insted of above dictionary we can also write-->
         return{
-            "id":x.id,
-            "contents":x.content,
+            "id":self.id,
+            "contents":self.content,
             "likes":random.randint(1,100),
         }

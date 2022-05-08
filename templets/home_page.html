@@ -77,6 +77,10 @@
       {
         alert(" you have not loged in, please login to tweet")
         window.location.href='/login'
+      }else if(xhr.status === 403) // this error is for rest API Isauthenticated function
+      {
+        alert(" you have not loged in, please login to tweet")
+        window.location.href='/login'
       }
         // const serverResponse = xhr.response
         // // console.log(serverResponse)
@@ -110,7 +114,7 @@
     xhr.onload = function () { 
       // after opening(loading) the url(/tweet) what we need to do, is defined in this function
       const serverResponse = xhr.response
-      const listedItems = serverResponse.response
+      const listedItems = serverResponse
       var listedobjects = ""
       for (let i = 0; i < listedItems.length; i++) {
         let listed=listedItems[i]
@@ -137,7 +141,7 @@
 
   function format_of_the_list(tweetobj) {
     var return_format = "<div class=' container mx-auto col-12 col-md-10  border rounded py-2 mb-4'>" + "<h1>" + tweetobj.id + "</h1>" +
-      "<p>" + tweetobj.contents + "</p>" +"<p>" + "<div class='btn-group'>"  +
+      "<p>" + tweetobj.content + "</p>" +"<p>" + "<div class='btn-group'>"  +
          like_button(tweetobj) + "</div>" + "</p>" + "</div>"
     return return_format;
   } // this function is used to extract data from the string and return the data to print data .
