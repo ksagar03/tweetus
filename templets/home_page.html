@@ -20,6 +20,24 @@
   this html will be replaced by the load_tweets
 </div>
 <script>
+//  this below function is for getting csrftoken cookie(whenever post method is called csrf 
+// token is genrated and also for that Csrf token a cookie is genrated )
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
   function to_handle_error_message(msg, display){
     var message_div_element= document.getElementById("to_print_alert_message")
     if(display === true)
@@ -128,21 +146,48 @@
   }
 
   load_tweets(getelement) // function call 
-
-  function To_make_a_count_of_likes(tweet, count) { 
+// whenever a new data is written in a data base we require a CSRf token 
+//  here for likes we have created a another database which has been linked to tweet data base 
+// via forign key
+  function To_make_a_count_of_likes(tweet, count, action) { 
     // this function is used to count number of likes for the comment or the post
-    console.log(tweet, count)
+    const url='/api/tweet/action'
+    const method='POST'
+    const data= JSON.stringify({
+      id:tweet,
+      action:action
+    })
+    const xhr= new XMLHttpRequest()
+    const csrftoken = getCookie('csrftoken');
+    xhr.open(method, url)
+    xhr.setRequestHeader('Content-Type','application/json')
+    xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest")
+    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest")
+    xhr.setRequestHeader("X-CSRFToken",csrftoken)
+    xhr.onload = function() {
+      //  console.log(xhr.status, xhr.response)
+      load_tweets(getelement)
+    }
+    xhr.send(data)
     return
   }
 
   function like_button(tweet) { // this function is used to create a button 
-    return "<button class='btn btn-dark' onclick=To_make_a_count_of_likes(" + tweet.id + "," + tweet.likes + ")> " + tweet.likes + " likes</button>"
+    return "<button class='btn btn-dark' onclick=To_make_a_count_of_likes(" + tweet.id + "," + tweet.likes + ",'like')> " + tweet.likes + " likes</button>"
+  } 
+
+  function unlike_button(tweet) { // this function is used to create a button 
+    return "<button class='btn btn-outline-dark' onclick=To_make_a_count_of_likes(" + tweet.id + "," + tweet.likes + ",'unlike')>Unlike</button>"
+  } 
+
+  function retweet_button(tweet) { // this function is used to create a button 
+    return "<button class='btn btn-outline-dark' onclick=To_make_a_count_of_likes(" + tweet.id + "," + tweet.likes + ",'retweet')>Retweet</button>"
   } 
 
   function format_of_the_list(tweetobj) {
     var return_format = "<div class=' container mx-auto col-12 col-md-10  border rounded py-2 mb-4'>" + "<h1>" + tweetobj.id + "</h1>" +
       "<p>" + tweetobj.content + "</p>" +"<p>" + "<div class='btn-group'>"  +
-         like_button(tweetobj) + "</div>" + "</p>" + "</div>"
+         like_button(tweetobj) + unlike_button(tweetobj) + retweet_button(tweetobj) + "</div>" + "</p>" + "</div>"
     return return_format;
   } // this function is used to extract data from the string and return the data to print data .
   // "<p>" + tweetobj.dates + "</p>"

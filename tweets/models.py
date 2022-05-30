@@ -8,13 +8,22 @@ from django.conf import settings
 users = settings.AUTH_USER_MODEL  
 
 # Create your models here.
+
+class tweet_like(models.Model):          #here we have created a separate table to store no of likes 
+    user= models.ForeignKey(users, on_delete=models.CASCADE)    
+    tweets=models.ForeignKey("tweet", on_delete=models.CASCADE)
+    timestamp= models.DateTimeField(auto_now_add=True)
+
 class tweet(models.Model):
     user= models.ForeignKey(users, on_delete=models.CASCADE)
     content=models.TextField(blank=True, null=True)
         # here we are specifying blank=True, null=True because when won't add a text and only add a image 
         # error should not be rised.
     image=models.FileField(upload_to='',blank=True, null=True)
-    # dates = models.DateTimeField()
+    likes=models.ManyToManyField(users, related_name='tweet_user', blank=True, through=tweet_like)
+        #  here many to many field means one tweet can have n number of likes from other user
+
+    dates = models.DateTimeField(auto_now_add=True)
     # likes=models.IntegerField(blank=True,null=True)As like function is not yet written
   
 

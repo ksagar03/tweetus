@@ -31,8 +31,7 @@ ALLOWED_HOSTS = ['127.0.0.1', 'mydomain.com']
 LOGIN_URL= '/login' # whenever user is not loged in properly then we use this login path
 
 MAX_TWEET_LENGTH = 100
-
-
+MAX_ACTION_ALLOWED=['like','unlike','retweet']
 # Application definition
 
 INSTALLED_APPS = [

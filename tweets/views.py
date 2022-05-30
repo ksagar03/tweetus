@@ -1,4 +1,6 @@
 
+from asyncio import exceptions
+from email import message
 from django.http import HttpResponse
 from django.http import response
 from django.http.response import Http404, JsonResponse
@@ -21,7 +23,7 @@ from django.utils.http import is_safe_url # is safe url is a built in function o
 #  we can also provide the url IP address which can be trusted or which are important to us 
 # can be saved in the setting.py-> allowed Host.
 from django.conf import settings
-from .serializers import tweetserializers
+from .serializers import tweetserializers,tweet_action_serializer
 allowedhost=settings.ALLOWED_HOSTS # importing allowed host from the settings.py
 # Create your views here.
 
@@ -74,6 +76,51 @@ def tweet_list_using_rest_api(request,*args, **kwargs):
     #     "response": tweet_list_view
     # }
     return Response(serializer.data, status=200)
+
+
+@api_view(['DELETE','POST'])
+@permission_classes([IsAuthenticated])
+def to_delete_tweets_from_the_data_base_using_rest_api(request,tweet_id,*args, **kwargs):
+    list=tweet.objects.filter(id=tweet_id)
+    if not list.exists():
+        return Response({}, status=401)
+    list=list.filter(user=request.user)
+    if not list.exists():
+        return Response({"message":"this tweet does not exist"}, status=401)
+    obj=list.first()
+    obj.delete()
+    return Response({"message": "deleted tweet"}, status=200)
+
+# like operation 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def tweet_actions_requried(request,*args, **kwargs):
+
+    #  here actions are "like, unlike and retweet"
+    # print(request.POST)
+    print(request.data)
+    serializer=tweet_action_serializer(data=request.data)
+    if serializer.is_valid( raise_exception=True):
+        data=serializer.validated_data
+        tweet_id=data.get('id')
+        action=data.get('action')
+    list=tweet.objects.filter(id=tweet_id)
+    if not list.exists():
+        return Response({}, status=401)
+    obj=list.first()
+    if action == 'like':
+        obj.likes.add(request.user)
+    elif action == 'unlike':
+        obj.likes.remove(request.user)
+    elif action == 'retweet':
+        pass
+    return Response({}, status=200)
+
+
+
+
+
+
 
 
 def create_view_of_the_tweet(request,*args, **kwargs):
