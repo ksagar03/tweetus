@@ -15,6 +15,8 @@ class tweet_like(models.Model):          #here we have created a separate table 
     timestamp= models.DateTimeField(auto_now_add=True)
 
 class tweet(models.Model):
+    # this below variable is for storing data of retweet(retweet resembles the parent and child relation ) 
+    parent=models.ForeignKey('self',null=True, on_delete=models.SET_NULL)
     user= models.ForeignKey(users, on_delete=models.CASCADE)
     content=models.TextField(blank=True, null=True)
         # here we are specifying blank=True, null=True because when won't add a text and only add a image 
@@ -29,6 +31,13 @@ class tweet(models.Model):
 
     class Meta:    # this meta needs to be in 'Meta' format otherwise it wont work
         ordering = ['-id']
+
+
+
+    @property  # this property will return a boolean value i.e it will check whether the tweet as
+    # has any retweet tweet 
+    def is_retweet(self):
+        return self.parent != None 
     
     def serialize(self):
         # tw_list=" [{"id":x.id,"contents":x.content,"likes":random.randint(1,100)} " for x in list]
