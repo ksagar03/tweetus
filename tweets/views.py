@@ -23,7 +23,7 @@ from django.utils.http import is_safe_url # is safe url is a built in function o
 #  we can also provide the url IP address which can be trusted or which are important to us 
 # can be saved in the setting.py-> allowed Host.
 from django.conf import settings
-from .serializers import tweetserializers,tweet_action_serializer
+from .serializers import tweet_create_serializers,tweet_read_only_serializers,tweet_action_serializer
 allowedhost=settings.ALLOWED_HOSTS # importing allowed host from the settings.py
 # Create your views here.
 
@@ -41,7 +41,7 @@ def home_page_html(request):
 @permission_classes([IsAuthenticated]) # this single line help us to authenticate the tweets
 #posted by the user  
 def create_view_of_the_tweet_using_rest_api(request,*args, **kwargs): 
-    serializer= tweetserializers( data=request.POST)
+    serializer= tweet_create_serializers( data=request.POST)
     # print("serializer=",serializer.is_valid())
     if serializer.is_valid(raise_exception=True):
         serializer.save(user=request.user)
@@ -63,13 +63,13 @@ def tweet_id_detailed_view_using_rest_api(request,tweet_id,*args, **kwargs):
     if not list.exists():
         return Response({}, status=401)
     detailed_view_of_list=list.first() # this line will store resent tweet in the variable
-    serializer=tweetserializers(detailed_view_of_list)
+    serializer=tweet_read_only_serializers(detailed_view_of_list)
     return Response(serializer.data, status=201 )
 
 @api_view(['GET'])
 def tweet_list_using_rest_api(request,*args, **kwargs):
     list=tweet.objects.all()
-    serializer=tweetserializers(list, many=True)
+    serializer=tweet_read_only_serializers(list, many=True)
     # tweet_list_view=[x.serialize() for x in list]
     # data={
     #     "isUser": False,                           all this line will be replaced by serial
@@ -104,16 +104,23 @@ def tweet_actions_requried(request,*args, **kwargs):
         data=serializer.validated_data
         tweet_id=data.get('id')
         action=data.get('action')
-    list=tweet.objects.filter(id=tweet_id)
-    if not list.exists():
-        return Response({}, status=401)
-    obj=list.first()
-    if action == 'like':
-        obj.likes.add(request.user)
-    elif action == 'unlike':
-        obj.likes.remove(request.user)
-    elif action == 'retweet':
-        pass
+        content=data.get('content')
+        list=tweet.objects.filter(id=tweet_id)
+        if not list.exists():
+            return Response({}, status=401)
+        obj=list.first()
+        if action == 'like':
+            obj.likes.add(request.user)
+            serializer=tweet_read_only_serializers(obj)
+            return Response(serializer.data,status=200)
+        elif action == 'unlike':
+            obj.likes.remove(request.user)
+        elif action == 'retweet':
+            parent_obj=obj
+            new_tweet=tweet.objects.create(user=request.user,
+            parent=obj,content=content)
+            serializer=tweet_read_only_serializers(new_tweet)
+            return Response(serializer.data,status=200)
     return Response({}, status=200)
 
 
