@@ -39,11 +39,12 @@ class tweet_read_only_serializers(serializers.ModelSerializer):
     likes= serializers.SerializerMethodField(read_only =True)# this line will allow to rad the likes
     # it will not allow us to change the likes.
     # content=serializers.SerializerMethodField(read_only=True) 
-    parent=tweet_create_serializers(read_only=True)
+    retweets=tweet_create_serializers(source='parent',read_only=True)
     class Meta:
         model =tweet
-        fields=['content', 'id', 'likes','parent' ]
+        fields=['content', 'id', 'likes','is_retweet','retweets' ]
     def get_likes(self,obj):
         return obj.likes.count()
     # def get_content(self,obj):
     #     return obj.content
+ 
