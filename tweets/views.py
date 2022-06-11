@@ -18,7 +18,7 @@ from rest_framework.permissions import IsAuthenticated
 # permission_class allows us to bring in multiple level permission
 # IsAuthenticated is a function which allows us to authenticate the tweets which will be posted
 # by the user. 
-from django.utils.http import is_safe_url # is safe url is a built in function of 
+from django.utils.http import url_has_allowed_host_and_scheme# is safe url is a built in function of 
 # django which is used to check whether the next url(redirected) is the safe url or not
 #  we can also provide the url IP address which can be trusted or which are important to us 
 # can be saved in the setting.py-> allowed Host.
@@ -152,7 +152,7 @@ def create_view_of_the_tweet(request,*args, **kwargs):
         obj.save()
         if request.is_ajax():
             return JsonResponse(obj.serialize(), status=201)
-        if next_url != None and is_safe_url(next_url,allowedhost):
+        if next_url != None and url_has_allowed_host_and_scheme(next_url,allowedhost):
             return redirect(next_url) # this conditon will redirect the webpage to the home page
         # redirect-> it is a shortcut feature of django which can redirect to any specified webpage. 
         form=tweetforms() 

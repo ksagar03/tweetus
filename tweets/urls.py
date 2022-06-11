@@ -13,12 +13,13 @@ tweet_id_detailed_view_using_rest_api,
  )
 urlpatterns = [
     path('',home_page_html),
-    path('action/',tweet_actions_requried),
+    path('action',tweet_actions_requried),
     path ('create/', create_view_of_the_tweet_using_rest_api),
     path('<int:tweet_id>/',tweet_id_detailed_view_using_rest_api),
     # path('tweet/',tweet_list_using_rest_api),
     path('<int:tweet_id>/delete/',to_delete_tweets_from_the_data_base_using_rest_api),
 ]
+#  followed rest api method.
 
 # urlpatterns = [
 #     path('admin/', admin.site.urls),
