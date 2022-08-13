@@ -61,10 +61,10 @@ def create_view_of_the_tweet_using_rest_api(request,*args, **kwargs):
 def tweet_id_detailed_view_using_rest_api(request,tweet_id,*args, **kwargs):
     list=tweet.objects.filter(id=tweet_id)
     if not list.exists():
-        return Response({}, status=401)
+        return Response({}, status=404)
     detailed_view_of_list=list.first() # this line will store resent tweet in the variable
     serializer=tweet_read_only_serializers(detailed_view_of_list)
-    return Response(serializer.data, status=201 )
+    return Response(serializer.data, status=200 )
 
 @api_view(['GET'])
 def tweet_list_using_rest_api(request,*args, **kwargs):
@@ -115,12 +115,12 @@ def tweet_actions_requried(request,*args, **kwargs):
             return Response(serializer.data,status=200)
         elif action == 'unlike':
             obj.likes.remove(request.user)
+            serializer=tweet_read_only_serializers(obj)
         elif action == 'retweet':
-            parent_obj=obj
             new_tweet=tweet.objects.create(user=request.user,
             parent=obj,content=content)
             serializer=tweet_read_only_serializers(new_tweet)
-            return Response(serializer.data,status=200)
+            return Response(serializer.data,status=201)
     return Response({}, status=200)
 
 

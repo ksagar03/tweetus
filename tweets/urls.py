@@ -12,7 +12,7 @@ tweet_id_detailed_view_using_rest_api,
  tweet_actions_requried,
  )
 urlpatterns = [
-    path('',home_page_html),
+    path('',tweet_list_using_rest_api),
     path('action',tweet_actions_requried),
     path ('create/', create_view_of_the_tweet_using_rest_api),
     path('<int:tweet_id>/',tweet_id_detailed_view_using_rest_api),
