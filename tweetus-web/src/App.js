@@ -1,5 +1,6 @@
 import {useEffect, useState} from "react" 
 import logo from './logo.svg';
+import Tweets from "./components/Tweets";
 import './App.css';
 
 //  this below function is coppied from homepage.html
@@ -91,8 +92,8 @@ function App() {
         <p>
           {errors && <p>{errors}</p>}
           {/* Edit <code>src/App.js</code> and save to reload. */}
-          {tweets.map((tweet) =>{
-            return  <li key={tweet.id}>{tweet.content}</li>   
+          {tweets.map((items,index) =>{
+            return  <Tweets className='my-5 py-5 border bg-white text-dark' key={index} tweet={items}  />   
           })}
         </p>
         <a
