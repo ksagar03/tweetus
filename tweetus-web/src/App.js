@@ -93,7 +93,8 @@ function App() {
           {errors && <p>{errors}</p>}
           {/* Edit <code>src/App.js</code> and save to reload. */}
           {tweets.map((items,index) =>{
-            return  <Tweets className='my-5 py-5 border bg-white text-dark' key={index} tweet={items}  />   
+            return  <Tweets className='my-5 py-5 border bg-white text-dark' key={index} tweet={items}  />  
+                     
           })}
         </p>
         <a
