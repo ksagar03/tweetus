@@ -3,7 +3,7 @@ import React,{useState} from 'react'
 function Button({action,style,tweet}) {
     const className = style ? style : 'btn btn-dark'
     const  [like,setLike] =useState(tweet.likes ? tweet.likes : 0)
-    const [onsecondtimeclick,setOnsecondtimeclick]= useState(false)
+    const [onsecondtimeclick,setOnsecondtimeclick]= useState(tweet.onsecondtimeclick === true ? true:false )
     const actionsdisplay = action.display ? action.display : 'Action'
     const display =action.type === "Likes" ? `${like} ${actionsdisplay}` : `${actionsdisplay}`
     const handleonClick =(ev) =>{
@@ -14,7 +14,7 @@ function Button({action,style,tweet}) {
           setOnsecondtimeclick(false)
         }else
         {
-          setLike(tweet.likes +1)// here using useState we are changing updating the likes
+          setLike(like +1)// here using useState we are changing updating the likes
           setOnsecondtimeclick(true)
         }
         
