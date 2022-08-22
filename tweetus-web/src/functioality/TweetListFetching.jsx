@@ -2,10 +2,26 @@ import React from 'react'
 import {useEffect, useState} from "react" 
 import Tweets from '../components/Tweets'
 
-const TweetListFetching = () => {
-    const [tweets,setTweets] = useState([])
+const TweetListFetching = ({newTweet}) => {
+    const [tweetsInit,setTweetsInit] = useState([])
     const [errors,setErrors]=useState(null)
+    const [tweets,setTweets]=useState([])
 
+    console.log(newTweet)
+    useEffect(()=>{
+      let final=[...newTweet].concat(tweetsInit)  // this line will create infinite loop so to
+      // overcome this we are creating new usestate and comparing final data with this useState.
+      console.log(final.length)
+      if(final.length !== tweets.length){
+        // here before adding new tweet both final.length and tweets.length have same length
+        // after tweeting new tweet final.length will increase and the condition will satisfy and
+        //  add the tweet to setTweets.
+        setTweets(final)
+      }
+      
+      console.log(tweets.length)
+    },[newTweet,tweetsInit,tweets]) // here [newTweet,tweetsInit,tweets] this are called dependency
+    //  array i.e the useeffect which we have written is dependent on this parameter([newTweet,tweetsInit,tweets])
     const fetchdata= async ()=>{
         // console.log(response,status)
       //   if (status === 200)
@@ -43,7 +59,7 @@ const TweetListFetching = () => {
           return response.json()
         }).then(data =>{
         //   console.log(data)
-          setTweets(data)
+          setTweetsInit(data)
         }).catch(err =>{
             setErrors(err.message)
         })

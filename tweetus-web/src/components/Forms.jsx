@@ -1,13 +1,26 @@
-import React from 'react'
+import React, {useState} from 'react'
+import TweetListFetching from '../functioality/TweetListFetching'
+
+// const [newTweet, setNewTweet]= useState([])
 
 const Forms = ({className}) => {
     const text_typed_inside_form= React.createRef() // this line provide the tweet typed by the user 
                                                             // inside the form 
+    const [newTweet, setNewTweet]= useState([])
     const handleonsubmit =(event)=>{
         event.preventDefault()
         // console.log(event)
-       const newTweet=text_typed_inside_form.current.value
-        console.log(newTweet)
+       const newTweet_typed=text_typed_inside_form.current.value
+       let tempTweet=[...newTweet]
+       tempTweet.unshift(
+        {
+          content: newTweet_typed,
+          like: 12,
+          id:1234
+        }
+       )
+       setNewTweet(tempTweet)
+      //  console.log(newTweet)
         text_typed_inside_form.current.value='' // after clicking on tweet btn it will clear the form
     }
   return (
@@ -20,6 +33,7 @@ const Forms = ({className}) => {
         </form>
   
     </div>
+    <TweetListFetching newTweet={newTweet}/>
     </div>
 
   )
