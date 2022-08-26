@@ -1,7 +1,6 @@
 
 
 from django.urls import path
-
 from .views import ( create_view_of_the_tweet, home_page, 
 home_page_html, tweet__id,
  tweet__ids, tweet_list, 

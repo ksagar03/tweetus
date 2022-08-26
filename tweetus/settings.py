@@ -129,6 +129,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = [
+    # BASE_DIR / "static",
+    os.path.join(BASE_DIR,"static")
+]
+STATIC_ROOT =os.path.join(BASE_DIR,"static-root")
+
+
 CORS_ORIGIN_ALLOW_ALL= True # this will allow other server to intract django server 
 CORS_URLS_REGEX = r"^/api/.*$"
 
