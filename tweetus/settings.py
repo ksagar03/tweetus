@@ -133,7 +133,10 @@ STATICFILES_DIRS = [
     # BASE_DIR / "static",
     os.path.join(BASE_DIR,"static")
 ]
-STATIC_ROOT =os.path.join(BASE_DIR,"static-root")
+STATIC_ROOT =os.path.join(BASE_DIR,"static-root") # Static root is an emulated version of the Static 
+    # server 
+    # by running the command python manage.py collectstatic(this command will collect(save) all the 
+    # required files inside the static-root directory)
 
 
 CORS_ORIGIN_ALLOW_ALL= True # this will allow other server to intract django server 

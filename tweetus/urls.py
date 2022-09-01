@@ -32,7 +32,9 @@ from django.views.generic import TemplateView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',home_page_html),
-    path('react/',TemplateView.as_view(template_name="React.html")),
+    path('react/',TemplateView.as_view(template_name="rendering_react_using_dj.html")), 
+    # this line will render 
+    # the content of the react in django server
     path ('create-tweet', create_view_of_the_tweet_using_rest_api),
     path('tweet/',tweet_list_using_rest_api),
     path('tweet/<int:tweet_id>',tweet_id_detailed_view_using_rest_api),
